@@ -6,7 +6,7 @@ export default function CartDrawer({ onClose }) {
 
   const handleClear = () => {
     dispatch({ type: 'CLEAR' })
-    fetch(`http://localhost:5000/api/cart/${userId}`, { method: 'DELETE' })
+    fetch(`${import.meta.env.VITE_API_URL}/api/cart/${userId}`, { method: 'DELETE' })
   }
   return (
     <div style={styles.overlay} onClick={onClose}>

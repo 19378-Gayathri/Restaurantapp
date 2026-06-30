@@ -13,7 +13,7 @@ export default function Home() {
     if (search) params.append('search', search);
     if (minRating > 0) params.append('minRating', minRating);
 
-    fetch(`http://localhost:5000/api/restaurants?${params}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/restaurants?${params}`)
       .then(r => r.json())
       .then(data => { setRestaurants(data); setLoading(false); });
   }, [search, minRating]);

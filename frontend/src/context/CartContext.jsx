@@ -1,8 +1,8 @@
-import { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import { createContext, useContext, useReducer, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 
 const CartContext = createContext();
-const API = 'http://localhost:5000/api/cart';
+const API = `${import.meta.env.VITE_API_URL}/api/cart`;
 
 function cartReducer(state, action) {
   switch (action.type) {
@@ -40,33 +40,26 @@ function cartReducer(state, action) {
 
 export function CartProvider({ children }) {
   const [cart, dispatch] = useReducer(cartReducer, []);
-  const { userId, isSignedIn, isLoaded } = useAuth();
-  const hasLoadedFromDB = useRef(false);
+  const { userId, isSignedIn } = useAuth();
 
-  // Load cart from DB once Clerk confirms a real signed-in user
+  // Load cart from DB when user signs in
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !userId) return;
-
+    if (!isSignedIn || !userId) return;
     fetch(`${API}/${userId}`)
       .then(r => r.json())
-      .then(items => {
-        dispatch({ type: 'LOAD', items });
-        hasLoadedFromDB.current = true;
-      })
+      .then(items => dispatch({ type: 'LOAD', items }))
       .catch(console.error);
-  }, [userId, isSignedIn, isLoaded]);
+  }, [userId, isSignedIn]);
 
-  // Save cart to DB only AFTER the initial load has completed
+  // Save cart to DB whenever it changes
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || !userId) return;
-    if (!hasLoadedFromDB.current) return;
-
+    if (!isSignedIn || !userId) return;
     fetch(`${API}/${userId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: cart })
     }).catch(console.error);
-  }, [cart, userId, isSignedIn, isLoaded]);
+  }, [cart, userId, isSignedIn]);
 
   const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const itemCount = cart.reduce((sum, i) => sum + i.quantity, 0);

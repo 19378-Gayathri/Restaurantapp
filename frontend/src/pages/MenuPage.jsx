@@ -13,7 +13,7 @@ export default function MenuPage() {
   const [added, setAdded] = useState({});
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/restaurants/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/restaurants/${id}`)
       .then(r => r.json())
       .then(setRestaurant);
   }, [id]);

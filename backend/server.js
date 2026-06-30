@@ -8,24 +8,18 @@ const cartRoutes = require('./routes/cart');
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    process.env.FRONTEND_URL || '*'
-  ]
-}));
+// Middleware
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
+// Routes
 app.use('/api/restaurants', restaurantRoutes);
 app.use('/api/cart', cartRoutes);
 
-app.get('/', (req, res) => res.send('FoodieHub API is running'));
-
-const PORT = process.env.PORT || 8080;
-
+// DB + Server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
-    app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+    app.listen(5000, () => console.log('Server running on port 5000'));
   })
   .catch(err => console.error(err));
